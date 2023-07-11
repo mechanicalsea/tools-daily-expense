@@ -2,7 +2,6 @@
 #include <fstream>
 #include <string>
 #include <set>
-#include <queue>
 #include <filesystem>
 #include <cstdio>
 
@@ -15,30 +14,24 @@ class MonlyExpense{
     fs::path outfile;
     fs::path outdir;
     const set<char> valid_char {'.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-    double queue_double(queue<char>& q)
-    {
-        string cost;
-        while(q.size() > 0){
-            cost.push_back(q.front());
-            q.pop();
-        }
-        if(cost.size() > 0){
-            return stod(cost);
-        }
-        return 0;
-    }
     double one_day(const string& line)
     {
         double costperday = 0.0;
-        queue<char> q;
+        string cost;
         for(char c: line)
         {
-            if(auto search = valid_char.find(c); search != valid_char.end())
-                q.push(c);
-            else
-                costperday += queue_double(q);
+            if(valid_char.count(c) == 1)
+            {
+                cost += c;
+            }
+            else if(cost.size() > 0)
+            {
+                costperday += stod(cost);
+                cost = "";
+            }
         }
-        costperday += queue_double(q);
+        if(cost.size() > 0)
+            costperday += stod(cost);
         return costperday;
     }
     public:
